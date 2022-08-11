@@ -97,7 +97,6 @@ function WelcomeClient(ent, connect)
 end
 
 function SetJuggernaut(ent)
-    print('Setting jug to ent ' .. ent.number)
     juggernaut = ent
     Putteam(ent, 'a')
     if not KILLS[ent.number] then
@@ -107,7 +106,6 @@ function SetJuggernaut(ent)
 end
 
 function PickJug(ent, team)
-    print('PickJug')
     if juggernaut == nil then
         if team == "human" then
             SetJuggernaut(ent)
@@ -116,7 +114,6 @@ function PickJug(ent, team)
 end
 
 function MaybeResetJug(ent, connect)
-    print('MaybeResetJug')
     -- TODO: Make this smarter by picking a player with the largest kill count or something...
     if SameEnt(ent, juggernaut) and not connect then
         local start = math.random(-1, 62)
@@ -134,40 +131,19 @@ function MaybeResetJug(ent, connect)
     end
 end
 
-function n(e)
-    if e ~= nil then
-        return e.number
-    end
-    return "<nil>"
-end
-
-function pt(t)
-    if t == nil then
-        print('<nil>')
-        return
-    end
-    for k,v in pairs(t) do
-        print(k .. ' ' .. v)
-    end
-end
-
 function JugDie(ent, inflictor, attacker, mod)
-    print('JugDie', n(ent), n(inflictor), n(attacker), mod)
     if inflictor ~= nil and inflictor.client ~= nil then
         oldOrigin = ent.origin
         pt(oldOrigin)
         Putteam(juggernaut, 'h')
         SetJuggernaut(inflictor)
     else
-        print('setting nil')
         oldOrigin = nil
     end
 end
 
 function KillCount(ent, inflictor, attacker, mod)
-    print('KillCount', n(e), n(inflictor), n(attacker), mod)
     if SameEnt(inflictor, juggernaut) then
-        print('is jug ' .. juggernaut.number)
         KILLS[juggernaut.number] = KILLS[juggernaut.number] + 1
         CP(nil, 'Juggernaut has ' .. KILLS[juggernaut.number] .. ' kills!')
         if KILLS[juggernaut.number] == KILLS_REQ then
@@ -177,9 +153,7 @@ function KillCount(ent, inflictor, attacker, mod)
 end
 
 function Accounting(ent)
-    print('Accounting', n(ent), n(juggernaut))
     if SameEnt(ent, juggernaut) then
-        print('Ent is jug')
         ent.die = JugDie
         if ent.client.health > 0 and oldOrigin ~= nil then
             pt(oldOrigin)
