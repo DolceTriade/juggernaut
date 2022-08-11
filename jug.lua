@@ -1,3 +1,11 @@
+-- Globals
+juggernaut = nil
+oldOrigin = nil
+teleport = nil
+gameOver = false
+KILLS_REQ = 10
+KILLS = {}
+
 function Say(ent, txt)
     local num = -1
     if ent ~= nil then
@@ -32,11 +40,20 @@ function PrintHelp(ent, args)
     Say(ent, [=[Welcome to the Juggernaut mod!
 Kill the Juggernaut (the alien) to become the alien.
 First alien with 10 kills wins the game!
-List of commands: !help']=])
+List of commands: !help !kills']=])
+end
+
+function PrintKills(ent, args)
+    local out = "Kills:\n"
+    for k,v in pairs(KILLS) do
+        out = out .. sgame.entity[k].client.name .. "^* = " .. v .. "\n"
+    end
+    Say(ent, out)
 end
 
 COMMANDS = {
     ["help"]=PrintHelp,
+    ["kills"]=PrintKills,
 }
 
 function SameEnt(a, b)
@@ -78,13 +95,6 @@ end
 function WelcomeClient(ent, connect)
     CP(ent, 'Welcome to the Juggernaut mod! Type !help for more info.')
 end
-
-juggernaut = nil
-oldOrigin = nil
-teleport = nil
-gameOver = false
-KILLS_REQ = 10
-KILLS = {}
 
 function SetJuggernaut(ent)
     print('Setting jug to ent ' .. ent.number)
