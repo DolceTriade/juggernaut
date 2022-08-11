@@ -118,14 +118,17 @@ function MaybeResetJug(ent, connect)
     if SameEnt(ent, juggernaut) and not connect then
         local start = math.random(-1, 62)
         local i = start
-        do
+        while true do
             local e = sgame.entity[i]
-            if e ~= nil and e.client ~= nil and e.team == "humans" then
+            if e ~= nil and e.client ~= nil and e.team == "human" then
                 SetJuggernaut(e)
                 return
             end
             i = i + 1
             i = i % 64
+            if i == start then
+                return
+            end
         end
         CP(nil, "Unable to set juggeranut!")
     end
