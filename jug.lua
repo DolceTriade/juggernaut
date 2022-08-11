@@ -134,7 +134,6 @@ end
 function JugDie(ent, inflictor, attacker, mod)
     if inflictor ~= nil and inflictor.client ~= nil then
         oldOrigin = ent.origin
-        pt(oldOrigin)
         Putteam(juggernaut, 'h')
         SetJuggernaut(inflictor)
     else
@@ -142,10 +141,21 @@ function JugDie(ent, inflictor, attacker, mod)
     end
 end
 
+function RestoreHealth()
+    local health = juggernaut.client.health
+    local max_health = unv.classes[juggernaut.client.class].health
+    health = health + max_health * 0.25
+    if health > max_health then
+        health = max_health
+    end
+    juggernaut.client.health = health
+end
+
 function KillCount(ent, inflictor, attacker, mod)
     if SameEnt(inflictor, juggernaut) then
         KILLS[juggernaut.number] = KILLS[juggernaut.number] + 1
         CP(nil, 'Juggernaut has ' .. KILLS[juggernaut.number] .. ' kills!')
+        RestoreHealth()
         if KILLS[juggernaut.number] == KILLS_REQ then
             gameOver = true
         end
@@ -156,7 +166,6 @@ function Accounting(ent)
     if SameEnt(ent, juggernaut) then
         ent.die = JugDie
         if ent.client.health > 0 and oldOrigin ~= nil then
-            pt(oldOrigin)
             teleport = oldOrigin
             oldOrigin = nil
             Timer.add(100, function() ent.client:teleport(teleport); teleport = nil; end)
