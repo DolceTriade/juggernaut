@@ -170,6 +170,7 @@ function Accounting(ent)
         ent.die = JugDie
         if ent.client.health > 0 and oldOrigin ~= nil then
             teleport = oldOrigin
+            teleport[3] = teleport[3] + 50
             oldOrigin = nil
             Timer.add(100, function() ent.client:teleport(teleport); teleport = nil; end)
         end
