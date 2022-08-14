@@ -6,6 +6,14 @@ gameOver = false
 KILLS_REQ = 10
 KILLS = {}
 
+function CopyTable(src)
+    local n = {}
+    for k, v in ipairs(src) do
+        n[k] = v
+    end
+    return n
+end
+
 function Say(ent, txt)
     local num = -1
     if ent ~= nil then
@@ -136,7 +144,7 @@ end
 
 function JugDie(ent, inflictor, attacker, mod)
     if inflictor ~= nil and inflictor.client ~= nil then
-        oldOrigin = ent.origin
+        oldOrigin = CopyTable(ent.origin)
         Putteam(juggernaut, 'h')
         SetJuggernaut(inflictor)
     else
@@ -169,7 +177,7 @@ function Accounting(ent)
     if SameEnt(ent, juggernaut) then
         ent.die = JugDie
         if ent.client.health > 0 and oldOrigin ~= nil then
-            teleport = oldOrigin
+            teleport = CopyTable(oldOrigin)
             teleport[3] = teleport[3] + 50
             oldOrigin = nil
             Timer.add(100, function() ent.client:teleport(teleport); teleport = nil; end)
