@@ -4,6 +4,7 @@ DEFAULT_SPAWN_PT = {2301, 2315, 148}
 juggernaut = nil
 oldOrigin = nil
 gameOver = false
+teleported = false
 KILLS_REQ = 10
 KILLS = {}
 
@@ -151,6 +152,7 @@ function JugDie(ent, inflictor, attacker, mod)
     else
         oldOrigin = nil
     end
+    teleported = false
 end
 
 function RestoreHealth()
@@ -176,9 +178,15 @@ end
 
 function Accounting(ent)
     if SameEnt(ent, juggernaut) then
+        -- If they are a spec, then they just entered the spawn menu. So force them to spawn.
+        if ent.client.class == 'spectator' then
+            ent.client:cmd('class level0')
+            return
+        end
         ent.die = JugDie
-        if ent.client.health > 0 and oldOrigin ~= nil then
+        if not teleported then
             ent.client:teleport(oldOrigin and oldOrigin or DEFAULT_SPAWN_PT)
+            teleported = true
         end
         return
     end
