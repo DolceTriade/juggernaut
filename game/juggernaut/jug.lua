@@ -117,9 +117,13 @@ end
 
 function PickJug(ent, team)
     if juggernaut == nil then
-        if team == "human" then
+        if team == 'alien' then
             SetJuggernaut(ent)
+            return
         end
+    end
+    if not SameEnt(ent, juggernaut) and team == 'alien' then
+        Putteam(ent, 'h')
     end
 end
 
