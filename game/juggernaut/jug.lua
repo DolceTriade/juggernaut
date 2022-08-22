@@ -1,7 +1,8 @@
 -- Globals
+DEFAULT_SPAWN_PT = {2301, 2315, 148}
+
 juggernaut = nil
 oldOrigin = nil
-teleport = nil
 gameOver = false
 KILLS_REQ = 10
 KILLS = {}
@@ -177,10 +178,7 @@ function Accounting(ent)
     if SameEnt(ent, juggernaut) then
         ent.die = JugDie
         if ent.client.health > 0 and oldOrigin ~= nil then
-            teleport = CopyTable(oldOrigin)
-            teleport[3] = teleport[3] + 50
-            oldOrigin = nil
-            Timer.add(100, function() ent.client:teleport(teleport); teleport = nil; end)
+            ent.client:teleport(oldOrigin and oldOrigin or DEFAULT_SPAWN_PT)
         end
         return
     end
