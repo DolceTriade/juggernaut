@@ -162,7 +162,7 @@ end
 function RestoreHealth()
     local health = juggernaut.client.health
     local max_health = unv.classes[juggernaut.client.class].health
-    health = health + max_health * 0.25
+    health = health + max_health * 0.5
     if health > max_health then
         health = max_health
     end
