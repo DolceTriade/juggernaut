@@ -115,36 +115,51 @@ function SetJuggernaut(ent)
     CP(nil, ent.client.name .. ' is now the juggernaut!')
 end
 
-function PickJug(ent, team)
+function OnTeamChange(ent, team)
+    -- Set the first juggernaut.
     if juggernaut == nil then
         if team == 'human' then
             SetJuggernaut(ent)
             return
         end
     end
-    if not SameEnt(ent, juggernaut) and team == 'alien' then
+    -- If the current juggernaut leaves, reset...
+    if SameEnt(juggernaut, ent) then
+        if team ~= 'alien' then
+            juggernaut = nil
+            ResetJug()
+        end
+        return
+    end
+    -- Don't let people join aliens unless they are the juggernaut.
+    if team == 'alien' then
         Putteam(ent, 'h')
     end
+end
+
+function ResetJug()
+    local start = math.random(-1, 62)
+    local i = start
+    while true do
+        local e = sgame.entity[i]
+        if e ~= nil and e.client ~= nil and e.team == "human" then
+            SetJuggernaut(e)
+            return
+        end
+        i = i + 1
+        i = i % 64
+        if i == start then
+            break
+        end
+    end
+    CP(nil, "Unable to set juggeranut!")
 end
 
 function MaybeResetJug(ent, connect)
     -- TODO: Make this smarter by picking a player with the largest kill count or something...
     if SameEnt(ent, juggernaut) and not connect then
-        local start = math.random(-1, 62)
-        local i = start
-        while true do
-            local e = sgame.entity[i]
-            if e ~= nil and e.client ~= nil and e.team == "human" then
-                SetJuggernaut(e)
-                return
-            end
-            i = i + 1
-            i = i % 64
-            if i == start then
-                return
-            end
-        end
-        CP(nil, "Unable to set juggeranut!")
+        juggernaut = nil
+        ResetJug()
     end
 end
 
@@ -180,16 +195,20 @@ function KillCount(ent, inflictor, attacker, mod)
     end
 end
 
-function Accounting(ent)
+function OnPlayerSpawn(ent)
+    if ent.team == 'spectator' then
+        return
+    end
     if SameEnt(ent, juggernaut) then
-        -- If they are a spec, then they just entered the spawn menu. So force them to spawn.
-        if ent.client.class == 'spectator' then
+        -- If they are a spec but on aliens, then they just entered the spawn menu. So force them to spawn.
+        if ent.client.class == 'spectator' and ent.team == 'alien' then
             ent.client:cmd('class level0')
             return
         end
         ent.die = JugDie
         if not teleported then
             ent.client:teleport(oldOrigin and oldOrigin or DEFAULT_SPAWN_PT)
+            oldOrigin = nil
             teleported = true
         end
         return
@@ -208,8 +227,8 @@ function init()
     sgame.hooks.RegisterChatHook(ExecChatCommand)
     sgame.hooks.RegisterClientConnectHook(WelcomeClient)
     sgame.hooks.RegisterClientConnectHook(MaybeResetJug)
-    sgame.hooks.RegisterTeamChangeHook(PickJug)
-    sgame.hooks.RegisterPlayerSpawnHook(Accounting)
+    sgame.hooks.RegisterTeamChangeHook(OnTeamChange)
+    sgame.hooks.RegisterPlayerSpawnHook(OnPlayerSpawn)
     sgame.hooks.RegisterGameEndHook(GameEnd)
     Cmd.exec('lock a')
     print('Loaded lua...')
