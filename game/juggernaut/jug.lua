@@ -1,5 +1,9 @@
 -- Globals
-DEFAULT_SPAWN_PT = {2301, 2315, 148}
+SPAWN_PTS = {
+    plat23 = {2301, 2315, 148},
+    antares = {-839, -1526, 15},
+}
+DEFAULT_SPAWN_PT = SPAWN_PTS[Cvar.get('mapname')] or {0, 0 , 0}
 
 juggernaut = nil
 oldOrigin = nil
