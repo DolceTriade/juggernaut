@@ -133,6 +133,7 @@ function OnTeamChange(ent, team)
             juggernaut = nil
             ResetJug()
         end
+        ent.client:cmd('class level0')
         return
     end
     -- Don't let people join aliens unless they are the juggernaut.
